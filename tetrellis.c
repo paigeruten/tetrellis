@@ -259,48 +259,14 @@ void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot) {
   }
 }
 
-int main(int argc, char * argv[]) {
-  // initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
-    exit(1);
-  }
-  atexit(SDL_Quit);
-
-  SDL_Surface * screen;
-  screen = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE);
-  if (screen == NULL) {
-    fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n", SDL_GetError());
-    exit(1);
-  }
-
-  // tests
-  int i;
-  int rot = 0;
-  for (i = 0; i < NUM_SHAPES; i++) {
-    draw_shape(screen, i * 50 + 50, 50, i, rot);
-  }
-
-  SDL_UpdateRect(screen, 0, 0, 640, 480);
-
+void tetrellis(SDL_Surface * surface) {
   SDL_Event event;
   int quit = 0;
+
   while (!quit) {
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
         case SDL_KEYDOWN:
-          if (event.key.keysym.sym == SDLK_UP) {
-            rot = (rot + 1) % NUM_ROTATIONS;
-
-            SDL_FillRect(screen, NULL, 0);
-
-            // tests
-            for (i = 0; i < NUM_SHAPES; i++) {
-              draw_shape(screen, i * 50 + 50, 50, i, rot);
-            }
-
-            SDL_UpdateRect(screen, 0, 0, 640, 480);
-          }
           break;
 
         case SDL_QUIT:
@@ -312,6 +278,26 @@ int main(int argc, char * argv[]) {
       }
     }
   }
+}
+
+int main(int argc, char * argv[]) {
+  // initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
+    exit(1);
+  }
+  atexit(SDL_Quit);
+
+  // make a screen
+  SDL_Surface * screen;
+  screen = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE);
+  if (screen == NULL) {
+    fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  // to the game
+  tetrellis(screen);
 
   return 0;
 }
