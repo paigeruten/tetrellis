@@ -1,0 +1,6 @@
+#define NUM_SHAPES 7
+#define NUM_ROTATIONS 4
+#define SHAPE_WIDTH 4
+#define SHAPE_HEIGHT 4
+
+extern int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH];
