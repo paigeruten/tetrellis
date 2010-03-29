@@ -1,0 +1,318 @@
+#include <stdlib.h>
+#include "SDL/SDL.h"
+
+#define NUM_SHAPES 7
+#define NUM_ROTATIONS 4
+#define SHAPE_WIDTH 4
+#define SHAPE_HEIGHT 4
+
+#define TILE_WIDTH 10
+#define TILE_HEIGHT 10
+
+int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH] = {
+  // I
+  {
+    {
+      { 1,0,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,1,1 }
+    },
+    {
+      { 1,0,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,1,1 }
+    }
+  },
+
+  // J
+  {
+    {
+      { 0,0,0,0 },
+      { 0,1,0,0 },
+      { 0,1,0,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,0,0,0 },
+      { 1,1,1,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,1,0 },
+      { 0,0,1,0 }
+    }
+  },
+
+  // L
+  {
+    {
+      { 0,0,0,0 },
+      { 1,0,0,0 },
+      { 1,0,0,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,1,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 0,1,0,0 },
+      { 0,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,0,1,0 },
+      { 1,1,1,0 }
+    }
+  },
+
+  // S
+  {
+    {
+      { 0,0,0,0 },
+      { 1,0,0,0 },
+      { 1,1,0,0 },
+      { 0,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,1,1,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 1,0,0,0 },
+      { 1,1,0,0 },
+      { 0,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,1,1,0 },
+      { 1,1,0,0 }
+    }
+  },
+
+  // Z
+  {
+    {
+      { 0,0,0,0 },
+      { 0,1,0,0 },
+      { 1,1,0,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 0,1,1,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,1,0,0 },
+      { 1,1,0,0 },
+      { 1,0,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 0,1,1,0 }
+    }
+  },
+
+  // T
+  {
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,1,0 },
+      { 0,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,1,0,0 },
+      { 1,1,0,0 },
+      { 0,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 0,1,0,0 },
+      { 1,1,1,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 1,0,0,0 },
+      { 1,1,0,0 },
+      { 1,0,0,0 }
+    }
+  },
+
+  // O
+  {
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 1,1,0,0 }
+    },
+    {
+      { 0,0,0,0 },
+      { 0,0,0,0 },
+      { 1,1,0,0 },
+      { 1,1,0,0 }
+    }
+  }
+};
+
+void putpixel(SDL_Surface * surface, int x, int y, Uint32 pixel) {
+  int bpp = surface->format->BytesPerPixel;
+  Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+  switch (bpp) {
+  case 1:
+    *p = pixel;
+    break;
+
+  case 2:
+    *(Uint16 *)p = pixel;
+    break;
+
+  case 3:
+    if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+      p[0] = (pixel >> 16) & 0xff;
+      p[1] = (pixel >> 8) & 0xff;
+      p[2] = pixel & 0xff;
+    } else {
+      p[0] = pixel & 0xff;
+      p[1] = (pixel >> 8) & 0xff;
+      p[2] = (pixel >> 16) & 0xff;
+    }
+    break;
+
+  case 4:
+    *(Uint32 *)p = pixel;
+    break;
+
+  default:
+    break;
+  }
+}
+
+void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot) {
+  int tile_x, tile_y;
+
+  SDL_Rect tile;
+  tile.w = TILE_WIDTH;
+  tile.h = TILE_HEIGHT;
+
+  for (tile_x = 0; tile_x < SHAPE_WIDTH; tile_x++) {
+    for (tile_y = 0; tile_y < SHAPE_HEIGHT; tile_y++) {
+      if (shapes[shape][rot][tile_y][tile_x] == 1) {
+        tile.x = x + tile_x * TILE_WIDTH;
+        tile.y = y + tile_y * TILE_HEIGHT;
+        SDL_FillRect(surface, &tile, shape * 5 + 5);
+      }
+    }
+  }
+}
+
+int main(int argc, char * argv[]) {
+  // initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
+    exit(1);
+  }
+  atexit(SDL_Quit);
+
+  SDL_Surface * screen;
+  screen = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE);
+  if (screen == NULL) {
+    fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n", SDL_GetError());
+    exit(1);
+  }
+
+  // tests
+  int i;
+  int rot = 0;
+  for (i = 0; i < NUM_SHAPES; i++) {
+    draw_shape(screen, i * 50 + 50, 50, i, rot);
+  }
+
+  SDL_UpdateRect(screen, 0, 0, 640, 480);
+
+  SDL_Event event;
+  int quit = 0;
+  while (!quit) {
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+        case SDL_KEYDOWN:
+          if (event.key.keysym.sym == SDLK_UP) {
+            rot = (rot + 1) % NUM_ROTATIONS;
+
+            SDL_FillRect(screen, NULL, 0);
+
+            // tests
+            for (i = 0; i < NUM_SHAPES; i++) {
+              draw_shape(screen, i * 50 + 50, 50, i, rot);
+            }
+
+            SDL_UpdateRect(screen, 0, 0, 640, 480);
+          }
+          break;
+
+        case SDL_QUIT:
+          quit = 1;
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+  return 0;
+}
+
