@@ -9,8 +9,6 @@
 #define TILE_WIDTH 10
 #define TILE_HEIGHT 10
 
-extern int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH];
-
 void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot);
 
 #endif
