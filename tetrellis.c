@@ -29,6 +29,8 @@ int collision(int shape, int rot, int x, int y) {
 }
 
 void freeze_block(void) {
+  if (current_block.shape == -1) return;
+
   int i, j;
 
   for (i = 0; i < SHAPE_HEIGHT; i++) {
@@ -43,25 +45,40 @@ void freeze_block(void) {
   next_shape = random_shape();
 }
 
-void move_block(int dx, int dy) {
+// returns true if block gets frozen
+int move_block(int dx, int dy) {
+  if (current_block.shape == -1) return 0;
+
   if (collision(current_block.shape, current_block.rot, current_block.x + dx, current_block.y + dy)) {
     // if the block is moving down, then it should come to rest.
     // otherwise just do nothing.
     if (dy) {
       freeze_block();
+      return 1;
     }
   } else {
     current_block.x += dx;
     current_block.y += dy;
   }
+
+  return 0;
 }
 
 void rotate_block(void) {
+  if (current_block.shape == -1) return;
+
   int new_rot = (current_block.rot + 1) % NUM_ROTATIONS;
 
   if (!collision(current_block.shape, new_rot, current_block.x, current_block.y)) {
     current_block.rot = new_rot;
   }
+}
+
+void drop_block(void) {
+  if (current_block.shape == -1) return;
+
+  while (!move_block(0, 1))
+    ;
 }
 
 void tetrellis(SDL_Surface * surface) {
@@ -89,6 +106,8 @@ void tetrellis(SDL_Surface * surface) {
           } else if (event.key.keysym.sym == SDLK_DOWN) {
             move_block(0, 1);
             last_tick = SDL_GetTicks();
+          } else if (event.key.keysym.sym == SDLK_SPACE) {
+            drop_block();
           }
           break;
 

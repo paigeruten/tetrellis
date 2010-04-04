@@ -12,7 +12,11 @@ typedef struct {
   int y;
 } Block;
 
-void move_block(int dx, int dy);
+int collision(int shape, int rot, int x, int y);
+void freeze_block(void);
+int move_block(int dx, int dy);
+void rotate_block(void);
+void drop_block(void);
 void tetrellis(SDL_Surface * surface);
 
 #endif
