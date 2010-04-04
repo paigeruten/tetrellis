@@ -8,12 +8,12 @@ void draw_field(SDL_Surface * surface) {
   SDL_Rect tile;
   SDL_Rect border;
 
-  border.x = FIELD_X - 1;
-  border.y = FIELD_Y - 1;
-  border.w = FIELD_WIDTH * TILE_WIDTH + 2;
-  border.h = FIELD_HEIGHT * TILE_HEIGHT + 2;
+  border.x = FIELD_X - 2;
+  border.y = FIELD_Y - 2;
+  border.w = FIELD_WIDTH * TILE_WIDTH + 4;
+  border.h = FIELD_HEIGHT * TILE_HEIGHT + 4;
 
-  SDL_FillRect(surface, &border, 10);
+  SDL_FillRect(surface, &border, COLOR_FIELD_BORDER);
 
   tile.w = TILE_WIDTH;
   tile.h = TILE_HEIGHT;
@@ -22,7 +22,7 @@ void draw_field(SDL_Surface * surface) {
     for (j = 0; j < FIELD_WIDTH; j++) {
       tile.x = FIELD_X + j * TILE_WIDTH;
       tile.y = FIELD_Y + i * TILE_HEIGHT;
-      SDL_FillRect(surface, &tile, field[i][j] + 1);
+      SDL_FillRect(surface, &tile, field[i][j] == -1 ? COLOR_FIELD_BACKGROUND : field[i][j]);
     }
   }
 }
