@@ -212,10 +212,25 @@ void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot) {
       if (shapes[shape][rot][tile_y][tile_x] == 1) {
         tile.x = x + tile_x * TILE_WIDTH;
         tile.y = y + tile_y * TILE_HEIGHT;
-        SDL_FillRect(surface, &tile, shape * 5 + 5);
+        SDL_FillRect(surface, &tile, shape);
       }
     }
   }
+}
+
+int real_shape_width(int shape, int rot) {
+  int max_width = 0;
+  int x, y;
+
+  for (x = 0; x < SHAPE_WIDTH; x++) {
+    for (y = 0; y < SHAPE_HEIGHT; y++) {
+      if (shapes[shape][rot][y][x]) {
+        max_width = x;
+      }
+    }
+  }
+
+  return max_width + 1;
 }
 
 int random_shape(void) {

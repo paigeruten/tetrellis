@@ -44,6 +44,9 @@ int main(int argc, char * argv[]) {
   // init palette
   init_palette(screen);
 
+  // some key repeat
+  SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
   // seed randomizer
   srand(time(NULL));
 

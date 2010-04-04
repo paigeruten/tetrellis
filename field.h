@@ -10,6 +10,8 @@
 #define FIELD_X ((SCREEN_WIDTH - FIELD_WIDTH * TILE_WIDTH) / 2)
 #define FIELD_Y ((SCREEN_HEIGHT - FIELD_HEIGHT * TILE_HEIGHT) / 2)
 
+extern int field[FIELD_HEIGHT][FIELD_WIDTH];
+
 void draw_field(SDL_Surface * surface);
 void clear_field(void);
 

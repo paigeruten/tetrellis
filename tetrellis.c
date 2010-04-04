@@ -6,13 +6,62 @@
 Block current_block;
 int next_shape;
 
+int collision(int shape, int rot, int x, int y) {
+  int i, j;
+
+  // first check for field boundaries
+  if (x < 0 || y < 0 || x + real_shape_width(shape, rot) > FIELD_WIDTH || y >= FIELD_HEIGHT) {
+    return 1;
+  }
+
+  // now for tiles
+  for (i = 0; i < SHAPE_HEIGHT; i++) {
+    for (j = 0; j < SHAPE_WIDTH; j++) {
+      if (shapes[shape][rot][i][j]) {
+        if (field[y + i][x + j] != -1) {
+          return 1;
+        }
+      }
+    }
+  }
+
+  return 0;
+}
+
+void freeze_block(void) {
+  int i, j;
+
+  for (i = 0; i < SHAPE_HEIGHT; i++) {
+    for (j = 0; j < SHAPE_WIDTH; j++) {
+      if (shapes[current_block.shape][current_block.rot][i][j]) {
+        field[current_block.y + i][current_block.x + j] = current_block.shape;
+      }
+    }
+  }
+
+  current_block.shape = -1;
+  next_shape = random_shape();
+}
+
 void move_block(int dx, int dy) {
-  current_block.x += dx;
-  current_block.y += dy;
+  if (collision(current_block.shape, current_block.rot, current_block.x + dx, current_block.y + dy)) {
+    // if the block is moving down, then it should come to rest.
+    // otherwise just do nothing.
+    if (dy) {
+      freeze_block();
+    }
+  } else {
+    current_block.x += dx;
+    current_block.y += dy;
+  }
 }
 
 void rotate_block(void) {
-  current_block.rot = (current_block.rot + 1) % NUM_ROTATIONS;
+  int new_rot = (current_block.rot + 1) % NUM_ROTATIONS;
+
+  if (!collision(current_block.shape, new_rot, current_block.x, current_block.y)) {
+    current_block.rot = new_rot;
+  }
 }
 
 void tetrellis(SDL_Surface * surface) {
@@ -39,6 +88,7 @@ void tetrellis(SDL_Surface * surface) {
             move_block(1, 0);
           } else if (event.key.keysym.sym == SDLK_DOWN) {
             move_block(0, 1);
+            last_tick = SDL_GetTicks();
           }
           break;
 
