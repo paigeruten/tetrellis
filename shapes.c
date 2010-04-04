@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "SDL/SDL.h"
 #include "shapes.h"
 
@@ -215,5 +216,9 @@ void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot) {
       }
     }
   }
+}
+
+int random_shape(void) {
+  return rand() % NUM_SHAPES;
 }
 
