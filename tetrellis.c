@@ -6,10 +6,19 @@
 Block current_block;
 int next_shape;
 
+void move_block(int dx, int dy) {
+  current_block.x += dx;
+  current_block.y += dy;
+}
+
+void rotate_block(void) {
+  current_block.rot = (current_block.rot + 1) % NUM_ROTATIONS;
+}
+
 void tetrellis(SDL_Surface * surface) {
   SDL_Event event;
   int quit = 0;
-  int last_tick;
+  long last_tick;
 
   clear_field();
 
@@ -22,6 +31,15 @@ void tetrellis(SDL_Surface * surface) {
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
         case SDL_KEYDOWN:
+          if (event.key.keysym.sym == SDLK_UP) {
+            rotate_block();
+          } else if (event.key.keysym.sym == SDLK_LEFT) {
+            move_block(-1, 0);
+          } else if (event.key.keysym.sym == SDLK_RIGHT) {
+            move_block(1, 0);
+          } else if (event.key.keysym.sym == SDLK_DOWN) {
+            move_block(0, 1);
+          }
           break;
 
         case SDL_QUIT:
@@ -41,7 +59,7 @@ void tetrellis(SDL_Surface * surface) {
       current_block.y = 0;
     } else {
       if (SDL_GetTicks() - last_tick > SPEED) {
-        current_block.y++;
+        move_block(0, 1);
         last_tick = SDL_GetTicks();
       }
     }

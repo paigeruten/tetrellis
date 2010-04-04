@@ -12,6 +12,7 @@ typedef struct {
   int y;
 } Block;
 
+void move_block(int dx, int dy);
 void tetrellis(SDL_Surface * surface);
 
 #endif
