@@ -142,6 +142,15 @@ void rotate_block(void) {
   }
 }
 
+void draw_shape_destination(SDL_Surface * surface, Block block) {
+  while (!collision(block.shape, block.rot, block.x, block.y)) {
+    block.y++;
+  }
+  block.y--;
+
+  draw_shape_outline(surface, FIELD_X + block.x * TILE_WIDTH, FIELD_Y + block.y * TILE_HEIGHT, block.shape, block.rot);
+}
+
 void drop_block(void) {
   if (current_block.shape == -1) return;
 
@@ -234,6 +243,7 @@ void tetrellis(SDL_Surface * surface) {
 
     if (current_block.shape != -1) {
       draw_shape(surface, FIELD_X + current_block.x * TILE_WIDTH, FIELD_Y + current_block.y * TILE_HEIGHT, current_block.shape, current_block.rot);
+      draw_shape_destination(surface, current_block);
     }
 
     SDL_UpdateRect(surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

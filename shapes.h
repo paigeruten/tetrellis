@@ -14,6 +14,7 @@
 extern int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH];
 
 void draw_shape(SDL_Surface * surface, int x, int y, int shape, int rot);
+void draw_shape_outline(SDL_Surface * surface, int x, int y, int shape, int rot);
 int real_shape_width(int shape, int rot);
 int real_shape_height(int shape, int rot);
 int random_shape(void);
