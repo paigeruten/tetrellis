@@ -1,11 +1,9 @@
 #include "SDL/SDL.h"
 #include "tetrellis.h"
 
-#define SPEED 1000 // will be variable eventually
-
 Block current_block;
 int next_shape;
-int gameover;
+int speed;
 
 int collision(int shape, int rot, int x, int y) {
   int i, j;
@@ -56,9 +54,10 @@ void clear_line(int line) {
   }
 }
 
-void clear_lines(void) {
+int clear_lines(void) {
   int i, j;
   int line_full;
+  int lines_cleared = 0;
 
   for (i = 0; i < FIELD_HEIGHT; i++) {
     line_full = 1;
@@ -70,8 +69,11 @@ void clear_lines(void) {
 
     if (line_full) {
       clear_line(i);
+      lines_cleared++;
     }
   }
+
+  return lines_cleared;
 }
 
 int game_over(void) {
@@ -120,10 +122,6 @@ int move_block(int dx, int dy) {
     // otherwise just do nothing.
     if (dy) {
       freeze_block();
-      clear_lines();
-      if (game_over()) {
-        gameover = 1;
-      }
       return 1;
     }
   } else {
@@ -153,15 +151,20 @@ void drop_block(void) {
 
 void tetrellis(SDL_Surface * surface) {
   SDL_Event event;
-  int quit = 0;
+  int quit;
   long last_tick;
+  int lines, lines_cleared;
+  int level;
 
   clear_field();
 
   current_block.shape = -1;
   next_shape = random_shape();
   last_tick = SDL_GetTicks();
-  gameover = 0;
+  speed = INITIAL_SPEED;
+  lines_cleared = 0;
+  quit = 0;
+  level = 1;
 
   while (!quit) {
     // handle input
@@ -200,13 +203,28 @@ void tetrellis(SDL_Surface * surface) {
 
       next_shape = random_shape();
     } else {
-      if (SDL_GetTicks() - last_tick > SPEED) {
+      if (SDL_GetTicks() - last_tick > speed) {
         move_block(0, 1);
         last_tick = SDL_GetTicks();
       }
     }
 
-    if (gameover) {
+    if (lines = clear_lines()) {
+      int i;
+      for (i = 0; i < lines; i++) {
+        if ((lines_cleared + i) % LINES_NEEDED_FOR_NEXT_LEVEL == 0) {
+          level++;
+          speed -= INCREASE_SPEED_BY;
+        }
+      }
+
+      lines_cleared += lines;
+
+      // DEBUG
+      printf("level = %d\nlines_cleared = %d\nspeed = %d\n\n", level, lines_cleared, speed);
+    }
+
+    if (game_over()) {
       quit = 1;
     }
 

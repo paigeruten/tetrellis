@@ -5,6 +5,10 @@
 #include "shapes.h"
 #include "field.h"
 
+#define INITIAL_SPEED 1000
+#define INCREASE_SPEED_BY 50
+#define LINES_NEEDED_FOR_NEXT_LEVEL 20
+
 #define NEXT_SHAPE_X (FIELD_X + FIELD_WIDTH * TILE_WIDTH + TILE_WIDTH)
 #define NEXT_SHAPE_Y (FIELD_Y)
 #define NEXT_SHAPE_WIDTH (SHAPE_WIDTH + 1)
@@ -21,7 +25,7 @@ typedef struct {
 int collision(int shape, int rot, int x, int y);
 void freeze_block(void);
 void clear_line(int line);
-void clear_lines(void);
+int clear_lines(void);
 int game_over(void);
 void draw_next_shape(SDL_Surface * surface);
 int move_block(int dx, int dy);
