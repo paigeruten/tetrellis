@@ -5,6 +5,7 @@
 
 Block current_block;
 int next_shape;
+int gameover;
 
 int collision(int shape, int rot, int x, int y) {
   int i, j;
@@ -96,6 +97,9 @@ int move_block(int dx, int dy) {
     if (dy) {
       freeze_block();
       clear_lines();
+      if (game_over()) {
+        gameover = 1;
+      }
       return 1;
     }
   } else {
@@ -133,6 +137,7 @@ void tetrellis(SDL_Surface * surface) {
   current_block.shape = -1;
   next_shape = random_shape();
   last_tick = SDL_GetTicks();
+  gameover = 0;
 
   while (!quit) {
     // handle input
@@ -173,6 +178,10 @@ void tetrellis(SDL_Surface * surface) {
         move_block(0, 1);
         last_tick = SDL_GetTicks();
       }
+    }
+
+    if (gameover) {
+      quit = 1;
     }
 
     // render to screen
