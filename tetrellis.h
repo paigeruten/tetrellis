@@ -5,6 +5,12 @@
 #include "shapes.h"
 #include "field.h"
 
+#define NEXT_SHAPE_X (FIELD_X + FIELD_WIDTH * TILE_WIDTH + TILE_WIDTH)
+#define NEXT_SHAPE_Y (FIELD_Y)
+#define NEXT_SHAPE_WIDTH (SHAPE_WIDTH + 1)
+#define NEXT_SHAPE_HEIGHT (SHAPE_HEIGHT + 1)
+#define NEXT_SHAPE_BORDER 2
+
 typedef struct {
   int shape;
   int rot;
@@ -17,6 +23,7 @@ void freeze_block(void);
 void clear_line(int line);
 void clear_lines(void);
 int game_over(void);
+void draw_next_shape(SDL_Surface * surface);
 int move_block(int dx, int dy);
 void rotate_block(void);
 void drop_block(void);

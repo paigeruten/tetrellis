@@ -43,7 +43,6 @@ void freeze_block(void) {
   }
 
   current_block.shape = -1;
-  next_shape = random_shape();
 }
 
 void clear_line(int line) {
@@ -85,6 +84,31 @@ int game_over(void) {
   }
 
   return 0;
+}
+
+void draw_next_shape(SDL_Surface * surface) {
+  int i, j;
+  SDL_Rect background;
+  SDL_Rect border;
+
+  border.x = NEXT_SHAPE_X - NEXT_SHAPE_BORDER;
+  border.y = NEXT_SHAPE_Y - NEXT_SHAPE_BORDER;
+  border.w = NEXT_SHAPE_WIDTH * TILE_WIDTH + NEXT_SHAPE_BORDER * 2;
+  border.h = NEXT_SHAPE_HEIGHT * TILE_HEIGHT + NEXT_SHAPE_BORDER * 2;
+  SDL_FillRect(surface, &border, COLOR_FIELD_BORDER);
+
+  background = border;
+  background.x += NEXT_SHAPE_BORDER;
+  background.y += NEXT_SHAPE_BORDER;
+  background.w -= NEXT_SHAPE_BORDER * 2;
+  background.h -= NEXT_SHAPE_BORDER * 2;
+  SDL_FillRect(surface, &background, COLOR_FIELD_BACKGROUND);
+
+  draw_shape(surface,
+             NEXT_SHAPE_X + (NEXT_SHAPE_WIDTH * TILE_WIDTH - real_shape_width(next_shape, 0) * TILE_WIDTH) / 2,
+             NEXT_SHAPE_Y + (NEXT_SHAPE_HEIGHT - real_shape_height(next_shape, 0)) * TILE_HEIGHT / 2 - (SHAPE_HEIGHT - real_shape_height(next_shape, 0)) * TILE_HEIGHT,
+             next_shape,
+             0);
 }
 
 // returns true if block gets frozen
@@ -173,6 +197,8 @@ void tetrellis(SDL_Surface * surface) {
       current_block.rot = 0;
       current_block.x = (FIELD_WIDTH - SHAPE_WIDTH) / 2;
       current_block.y = real_shape_height(current_block.shape, current_block.rot) - SHAPE_HEIGHT;
+
+      next_shape = random_shape();
     } else {
       if (SDL_GetTicks() - last_tick > SPEED) {
         move_block(0, 1);
@@ -186,6 +212,7 @@ void tetrellis(SDL_Surface * surface) {
 
     // render to screen
     draw_field(surface);
+    draw_next_shape(surface);
 
     if (current_block.shape != -1) {
       draw_shape(surface, FIELD_X + current_block.x * TILE_WIDTH, FIELD_Y + current_block.y * TILE_HEIGHT, current_block.shape, current_block.rot);
