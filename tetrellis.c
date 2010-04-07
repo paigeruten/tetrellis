@@ -10,7 +10,7 @@ int collision(int shape, int rot, int x, int y) {
   int i, j;
 
   // first check for field boundaries
-  if (x < 0 || y < 0 || x + real_shape_width(shape, rot) > FIELD_WIDTH || y >= FIELD_HEIGHT) {
+  if (x < 0 || x + real_shape_width(shape, rot) > FIELD_WIDTH || y >= FIELD_HEIGHT) {
     return 1;
   }
 
@@ -45,6 +45,47 @@ void freeze_block(void) {
   next_shape = random_shape();
 }
 
+void clear_line(int line) {
+  int current_line;
+  int i;
+
+  for (current_line = line; current_line > 0; current_line--) {
+    for (i = 0; i < FIELD_WIDTH; i++) {
+      field[current_line][i] = field[current_line - 1][i];
+    }
+  }
+}
+
+void clear_lines(void) {
+  int i, j;
+  int line_full;
+
+  for (i = 0; i < FIELD_HEIGHT; i++) {
+    line_full = 1;
+    for (j = 0; j < FIELD_WIDTH; j++) {
+      if (field[i][j] == -1) {
+        line_full = 0;
+      }
+    }
+
+    if (line_full) {
+      clear_line(i);
+    }
+  }
+}
+
+int game_over(void) {
+  int i;
+
+  for (i = 0; i < FIELD_WIDTH; i++) {
+    if (field[0][i] != -1) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 // returns true if block gets frozen
 int move_block(int dx, int dy) {
   if (current_block.shape == -1) return 0;
@@ -54,6 +95,7 @@ int move_block(int dx, int dy) {
     // otherwise just do nothing.
     if (dy) {
       freeze_block();
+      clear_lines();
       return 1;
     }
   } else {
@@ -125,7 +167,7 @@ void tetrellis(SDL_Surface * surface) {
       current_block.shape = next_shape;
       current_block.rot = 0;
       current_block.x = (FIELD_WIDTH - SHAPE_WIDTH) / 2;
-      current_block.y = 0;
+      current_block.y = real_shape_height(current_block.shape, current_block.rot) - SHAPE_HEIGHT;
     } else {
       if (SDL_GetTicks() - last_tick > SPEED) {
         move_block(0, 1);

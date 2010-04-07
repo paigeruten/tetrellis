@@ -233,6 +233,21 @@ int real_shape_width(int shape, int rot) {
   return max_width + 1;
 }
 
+int real_shape_height(int shape, int rot) {
+  int max_height = SHAPE_HEIGHT;
+  int x, y;
+
+  for (y = SHAPE_HEIGHT; y >= 0; y--) {
+    for (x = 0; x < SHAPE_WIDTH; x++) {
+      if (shapes[shape][rot][y][x]) {
+        max_height = y;
+      }
+    }
+  }
+
+  return SHAPE_HEIGHT - max_height;
+}
+
 int random_shape(void) {
   return rand() % NUM_SHAPES;
 }
