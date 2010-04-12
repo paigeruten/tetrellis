@@ -1,6 +1,8 @@
 #include "SDL/SDL.h"
 #include "tetrellis.h"
 
+Block BLOCK_NULL = (Block){ SHAPE_NULL, 0, 0, 0 };
+
 Block current_block;
 int next_shape;
 int speed;

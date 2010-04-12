@@ -22,7 +22,6 @@ typedef struct {
   int y;
 } Block;
 
-Block BLOCK_NULL = (Block){ SHAPE_NULL, 0, 0, 0 };
 #define NULL_BLOCK(x) (NULL_SHAPE((x).shape))
 
 int collision(Block block);
