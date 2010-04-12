@@ -5,19 +5,19 @@ Block current_block;
 int next_shape;
 int speed;
 
-int collision(int shape, int rot, int x, int y) {
+int collision(Block block) {
   int i, j;
 
   // first check for field boundaries
-  if (x < 0 || x + real_shape_width(shape, rot) > FIELD_WIDTH || y >= FIELD_HEIGHT) {
+  if (block.x < 0 || block.x + real_shape_width(block.shape, block.rot) > FIELD_WIDTH || block.y >= FIELD_HEIGHT) {
     return 1;
   }
 
   // now for tiles
   for (i = 0; i < SHAPE_HEIGHT; i++) {
     for (j = 0; j < SHAPE_WIDTH; j++) {
-      if (shapes[shape][rot][i][j]) {
-        if (field[y + i][x + j] != -1) {
+      if (shapes[block.shape][block.rot][i][j]) {
+        if (! NULL_SHAPE(field[block.y + i][block.x + j])) {
           return 1;
         }
       }
@@ -28,7 +28,7 @@ int collision(int shape, int rot, int x, int y) {
 }
 
 void freeze_block(void) {
-  if (current_block.shape == -1) return;
+  if (NULL_BLOCK(current_block)) return;
 
   int i, j;
 
@@ -40,7 +40,7 @@ void freeze_block(void) {
     }
   }
 
-  current_block.shape = -1;
+  current_block = BLOCK_NULL;
 }
 
 void clear_line(int line) {
@@ -62,7 +62,7 @@ int clear_lines(void) {
   for (i = 0; i < FIELD_HEIGHT; i++) {
     line_full = 1;
     for (j = 0; j < FIELD_WIDTH; j++) {
-      if (field[i][j] == -1) {
+      if (NULL_SHAPE(field[i][j])) {
         line_full = 0;
       }
     }
@@ -80,7 +80,7 @@ int game_over(void) {
   int i;
 
   for (i = 0; i < FIELD_WIDTH; i++) {
-    if (field[0][i] != -1) {
+    if (! NULL_SHAPE(field[0][i])) {
       return 1;
     }
   }
@@ -115,9 +115,13 @@ void draw_next_shape(SDL_Surface * surface) {
 
 // returns true if block gets frozen
 int move_block(int dx, int dy) {
-  if (current_block.shape == -1) return 0;
+  if (NULL_BLOCK(current_block)) return 0;
 
-  if (collision(current_block.shape, current_block.rot, current_block.x + dx, current_block.y + dy)) {
+  Block new_block = current_block;
+  new_block.x += dx;
+  new_block.y += dy;
+
+  if (collision(new_block)) {
     // if the block is moving down, then it should come to rest.
     // otherwise just do nothing.
     if (dy) {
@@ -125,25 +129,25 @@ int move_block(int dx, int dy) {
       return 1;
     }
   } else {
-    current_block.x += dx;
-    current_block.y += dy;
+    current_block = new_block;
   }
 
   return 0;
 }
 
 void rotate_block(void) {
-  if (current_block.shape == -1) return;
+  if (NULL_BLOCK(current_block)) return;
 
-  int new_rot = (current_block.rot + 1) % NUM_ROTATIONS;
+  Block new_block = current_block;
+  new_block.rot = (current_block.rot + 1) % NUM_ROTATIONS;
 
-  if (!collision(current_block.shape, new_rot, current_block.x, current_block.y)) {
-    current_block.rot = new_rot;
+  if (! collision(new_block)) {
+    current_block = new_block;
   }
 }
 
 void draw_shape_destination(SDL_Surface * surface, Block block) {
-  while (!collision(block.shape, block.rot, block.x, block.y)) {
+  while (! collision(block)) {
     block.y++;
   }
   block.y--;
@@ -152,9 +156,9 @@ void draw_shape_destination(SDL_Surface * surface, Block block) {
 }
 
 void drop_block(void) {
-  if (current_block.shape == -1) return;
+  if (NULL_BLOCK(current_block)) return;
 
-  while (!move_block(0, 1))
+  while (! move_block(0, 1))
     ;
 }
 
@@ -167,7 +171,7 @@ void tetrellis(SDL_Surface * surface) {
 
   clear_field();
 
-  current_block.shape = -1;
+  current_block = BLOCK_NULL;
   next_shape = random_shape();
   last_tick = SDL_GetTicks();
   speed = INITIAL_SPEED;
@@ -175,7 +179,7 @@ void tetrellis(SDL_Surface * surface) {
   quit = 0;
   level = 1;
 
-  while (!quit) {
+  while (! quit) {
     // handle input
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
@@ -204,7 +208,7 @@ void tetrellis(SDL_Surface * surface) {
     }
 
     // update gamestate
-    if (current_block.shape == -1) {
+    if (NULL_BLOCK(current_block)) {
       current_block.shape = next_shape;
       current_block.rot = 0;
       current_block.x = (FIELD_WIDTH - SHAPE_WIDTH) / 2;
@@ -241,7 +245,7 @@ void tetrellis(SDL_Surface * surface) {
     draw_field(surface);
     draw_next_shape(surface);
 
-    if (current_block.shape != -1) {
+    if (! NULL_BLOCK(current_block)) {
       draw_shape(surface, FIELD_X + current_block.x * TILE_WIDTH, FIELD_Y + current_block.y * TILE_HEIGHT, current_block.shape, current_block.rot);
       draw_shape_destination(surface, current_block);
     }

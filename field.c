@@ -22,7 +22,7 @@ void draw_field(SDL_Surface * surface) {
     for (j = 0; j < FIELD_WIDTH; j++) {
       tile.x = FIELD_X + j * TILE_WIDTH;
       tile.y = FIELD_Y + i * TILE_HEIGHT;
-      SDL_FillRect(surface, &tile, field[i][j] == -1 ? COLOR_FIELD_BACKGROUND : field[i][j]);
+      SDL_FillRect(surface, &tile, NULL_SHAPE(field[i][j]) ? COLOR_FIELD_BACKGROUND : field[i][j]);
     }
   }
 }
@@ -31,7 +31,7 @@ void clear_field(void) {
   int i, j;
   for (i = 0; i < FIELD_HEIGHT; i++) {
     for (j = 0; j < FIELD_WIDTH; j++) {
-      field[i][j] = -1;
+      field[i][j] = SHAPE_NULL;
     }
   }
 }

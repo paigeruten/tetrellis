@@ -3,6 +3,9 @@
 
 #include "main.h"
 
+#define SHAPE_NULL (-1)
+#define NULL_SHAPE(x) ((x) == SHAPE_NULL)
+
 #define NUM_SHAPES 7
 #define NUM_ROTATIONS 4
 #define SHAPE_WIDTH 4

@@ -22,7 +22,10 @@ typedef struct {
   int y;
 } Block;
 
-int collision(int shape, int rot, int x, int y);
+Block BLOCK_NULL = (Block){ SHAPE_NULL, 0, 0, 0 };
+#define NULL_BLOCK(x) (NULL_SHAPE((x).shape))
+
+int collision(Block block);
 void freeze_block(void);
 void clear_line(int line);
 int clear_lines(void);
