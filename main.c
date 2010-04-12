@@ -49,7 +49,7 @@ int main(int argc, char * argv[]) {
   srand(time(NULL));
 
   // to the game
-  tetrellis(screen);
+  game(screen);
 
   return 0;
 }
