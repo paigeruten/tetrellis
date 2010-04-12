@@ -8,16 +8,16 @@ void handle_input(Tetrellis * tetrellis) {
     switch (event.type) {
       case SDL_KEYDOWN:
         if (event.key.keysym.sym == SDLK_UP) {
-          rotate_block(&tetrellis->current_block);
+          rotate_block(&tetrellis->current_block, tetrellis->field);
         } else if (event.key.keysym.sym == SDLK_LEFT) {
-          move_block(&tetrellis->current_block, -1, 0);
+          move_block(&tetrellis->current_block, -1, 0, tetrellis->field);
         } else if (event.key.keysym.sym == SDLK_RIGHT) {
-          move_block(&tetrellis->current_block, 1, 0);
+          move_block(&tetrellis->current_block, 1, 0, tetrellis->field);
         } else if (event.key.keysym.sym == SDLK_DOWN) {
-          move_block(&tetrellis->current_block, 0, 1);
+          move_block(&tetrellis->current_block, 0, 1, tetrellis->field);
           tetrellis->last_tick = SDL_GetTicks();
         } else if (event.key.keysym.sym == SDLK_SPACE) {
-          drop_block(&tetrellis->current_block);
+          drop_block(&tetrellis->current_block, tetrellis->field);
         }
         break;
 
@@ -42,14 +42,14 @@ void update_gamestate(Tetrellis * tetrellis) {
     tetrellis->next_shape = random_shape();
   } else {
     if (SDL_GetTicks() - tetrellis->last_tick > tetrellis->speed) {
-      move_block(&tetrellis->current_block, 0, 1);
+      move_block(&tetrellis->current_block, 0, 1, tetrellis->field);
       tetrellis->last_tick = SDL_GetTicks();
     }
   }
 
   // clear any lines made
   int lines;
-  if (lines = clear_lines()) {
+  if (lines = clear_lines(tetrellis->field)) {
     int i;
     for (i = 0; i < lines; i++) {
       if ((tetrellis->lines_cleared + i) % LINES_NEEDED_FOR_NEXT_LEVEL == 0) {
@@ -63,18 +63,18 @@ void update_gamestate(Tetrellis * tetrellis) {
     printf("Level %d\n%d lines cleared\n\n", tetrellis->level, tetrellis->lines_cleared);
   }
 
-  if (game_over()) {
+  if (game_over(tetrellis->field)) {
     tetrellis->quit = 1;
   }
 }
 
 void render(SDL_Surface * surface, Tetrellis * tetrellis) {
-  draw_field(surface);
+  draw_field(tetrellis->field, surface);
   draw_next_shape(surface, tetrellis->next_shape);
 
   if (! NULL_BLOCK(tetrellis->current_block)) {
     draw_shape(surface, FIELD_X + tetrellis->current_block.x * TILE_WIDTH, FIELD_Y + tetrellis->current_block.y * TILE_HEIGHT, tetrellis->current_block.shape, tetrellis->current_block.rot);
-    draw_block_destination(surface, tetrellis->current_block);
+    draw_block_destination(surface, tetrellis->current_block, tetrellis->field);
   }
 
   SDL_UpdateRect(surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -82,6 +82,7 @@ void render(SDL_Surface * surface, Tetrellis * tetrellis) {
 
 void game(SDL_Surface * surface) {
   Tetrellis tetrellis;
+  tetrellis.field = make_field();
   tetrellis.current_block = BLOCK_NULL;
   tetrellis.next_shape = random_shape();
   tetrellis.last_tick = SDL_GetTicks();
@@ -90,7 +91,7 @@ void game(SDL_Surface * surface) {
   tetrellis.level = 1;
   tetrellis.quit = 0;
 
-  clear_field();
+  clear_field(tetrellis.field);
 
   while (! tetrellis.quit) {
     handle_input(&tetrellis);
@@ -99,5 +100,7 @@ void game(SDL_Surface * surface) {
 
     SDL_Delay(1);
   }
+
+  destroy_field(tetrellis.field);
 }
 

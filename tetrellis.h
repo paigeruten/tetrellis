@@ -12,6 +12,7 @@
 #define LINES_NEEDED_FOR_NEXT_LEVEL 20
 
 typedef struct {
+  Field field;
   Block current_block;
   int next_shape;
   int last_tick;

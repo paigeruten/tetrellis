@@ -1,17 +1,25 @@
+#include <malloc.h>
 #include "SDL/SDL.h"
 #include "field.h"
 
-int field[FIELD_HEIGHT][FIELD_WIDTH];
-
-int field_get(int x, int y) {
-  return field[y][x];
+Field make_field(void) {
+  Field field = (Field)malloc(sizeof(int) * FIELD_WIDTH * FIELD_HEIGHT);
+  return field;
 }
 
-void field_set(int x, int y, int color) {
-  field[y][x] = color;
+void destroy_field(Field field) {
+  free(field);
 }
 
-void draw_field(SDL_Surface * surface) {
+int field_get(Field field, int x, int y) {
+  return field[x + y * FIELD_WIDTH];
+}
+
+void field_set(Field field, int x, int y, int color) {
+  field[x + y * FIELD_WIDTH] = color;
+}
+
+void draw_field(Field field, SDL_Surface * surface) {
   int i, j;
   SDL_Rect tile;
   SDL_Rect border;
@@ -30,32 +38,32 @@ void draw_field(SDL_Surface * surface) {
     for (j = 0; j < FIELD_WIDTH; j++) {
       tile.x = FIELD_X + j * TILE_WIDTH;
       tile.y = FIELD_Y + i * TILE_HEIGHT;
-      SDL_FillRect(surface, &tile, NULL_SHAPE(field[i][j]) ? COLOR_FIELD_BACKGROUND : field[i][j]);
+      SDL_FillRect(surface, &tile, NULL_SHAPE(field_get(field, j, i)) ? COLOR_FIELD_BACKGROUND : field_get(field, j, i));
     }
   }
 }
 
-void clear_field(void) {
+void clear_field(Field field) {
   int i, j;
   for (i = 0; i < FIELD_HEIGHT; i++) {
     for (j = 0; j < FIELD_WIDTH; j++) {
-      field[i][j] = SHAPE_NULL;
+      field_set(field, j, i, SHAPE_NULL);
     }
   }
 }
 
-void clear_line(int line) {
+void clear_line(Field field, int line) {
   int current_line;
   int i;
 
   for (current_line = line; current_line > 0; current_line--) {
     for (i = 0; i < FIELD_WIDTH; i++) {
-      field[current_line][i] = field[current_line - 1][i];
+      field_set(field, i, current_line, field_get(field, i, current_line - 1));
     }
   }
 }
 
-int clear_lines(void) {
+int clear_lines(Field field) {
   int i, j;
   int line_full;
   int lines_cleared = 0;
@@ -63,13 +71,13 @@ int clear_lines(void) {
   for (i = 0; i < FIELD_HEIGHT; i++) {
     line_full = 1;
     for (j = 0; j < FIELD_WIDTH; j++) {
-      if (NULL_SHAPE(field[i][j])) {
+      if (NULL_SHAPE(field_get(field, j, i))) {
         line_full = 0;
       }
     }
 
     if (line_full) {
-      clear_line(i);
+      clear_line(field, i);
       lines_cleared++;
     }
   }
@@ -77,11 +85,11 @@ int clear_lines(void) {
   return lines_cleared;
 }
 
-int game_over(void) {
+int game_over(Field field) {
   int i;
 
   for (i = 0; i < FIELD_WIDTH; i++) {
-    if (! NULL_SHAPE(field[0][i])) {
+    if (! NULL_SHAPE(field_get(field, i, 0))) {
       return 1;
     }
   }
