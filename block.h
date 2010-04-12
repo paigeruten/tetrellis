@@ -1,6 +1,7 @@
 #ifndef _block_h
 #define _block_h
 
+#include "main.h"
 #include "shapes.h"
 #include "field.h"
 
@@ -19,6 +20,7 @@ Block freeze_block(Block block);
 Block move_block(Block block, int dx, int dy);
 Block rotate_block(Block block);
 Block drop_block(Block block);
+void draw_block_destination(SDL_Surface * surface, Block block);
 
 #endif
 

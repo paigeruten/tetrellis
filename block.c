@@ -82,4 +82,12 @@ Block drop_block(Block block) {
   return block;
 }
 
+void draw_block_destination(SDL_Surface * surface, Block block) {
+  while (! collision(block)) {
+    block.y++;
+  }
+  block.y--;
+
+  draw_shape_outline(surface, FIELD_X + block.x * TILE_WIDTH, FIELD_Y + block.y * TILE_HEIGHT, block.shape, block.rot);
+}
 

@@ -2,7 +2,6 @@
 #include <time.h>
 #include "SDL/SDL.h"
 #include "main.h"
-#include "shapes.h"
 #include "tetrellis.h"
 
 void init_palette(SDL_Surface * surface) {

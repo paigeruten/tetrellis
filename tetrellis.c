@@ -1,40 +1,6 @@
 #include "SDL/SDL.h"
 #include "tetrellis.h"
 
-void draw_next_shape(SDL_Surface * surface, int shape) {
-  int i, j;
-  SDL_Rect background;
-  SDL_Rect border;
-
-  border.x = NEXT_SHAPE_X - NEXT_SHAPE_BORDER;
-  border.y = NEXT_SHAPE_Y - NEXT_SHAPE_BORDER;
-  border.w = NEXT_SHAPE_WIDTH * TILE_WIDTH + NEXT_SHAPE_BORDER * 2;
-  border.h = NEXT_SHAPE_HEIGHT * TILE_HEIGHT + NEXT_SHAPE_BORDER * 2;
-  SDL_FillRect(surface, &border, COLOR_FIELD_BORDER);
-
-  background = border;
-  background.x += NEXT_SHAPE_BORDER;
-  background.y += NEXT_SHAPE_BORDER;
-  background.w -= NEXT_SHAPE_BORDER * 2;
-  background.h -= NEXT_SHAPE_BORDER * 2;
-  SDL_FillRect(surface, &background, COLOR_FIELD_BACKGROUND);
-
-  draw_shape(surface,
-             NEXT_SHAPE_X + (NEXT_SHAPE_WIDTH * TILE_WIDTH - real_shape_width(shape, 0) * TILE_WIDTH) / 2,
-             NEXT_SHAPE_Y + (NEXT_SHAPE_HEIGHT - real_shape_height(shape, 0)) * TILE_HEIGHT / 2 - (SHAPE_HEIGHT - real_shape_height(shape, 0)) * TILE_HEIGHT,
-             shape,
-             0);
-}
-
-void draw_shape_destination(SDL_Surface * surface, Block block) {
-  while (! collision(block)) {
-    block.y++;
-  }
-  block.y--;
-
-  draw_shape_outline(surface, FIELD_X + block.x * TILE_WIDTH, FIELD_Y + block.y * TILE_HEIGHT, block.shape, block.rot);
-}
-
 void tetrellis(SDL_Surface * surface) {
   SDL_Event event;
   int quit;
@@ -109,8 +75,7 @@ void tetrellis(SDL_Surface * surface) {
 
       lines_cleared += lines;
 
-      // DEBUG
-      printf("level = %d\nlines_cleared = %d\nspeed = %d\n\n", level, lines_cleared, speed);
+      printf("Level %d\n%d lines cleared\n\n", level, lines_cleared);
     }
 
     if (game_over()) {
@@ -123,7 +88,7 @@ void tetrellis(SDL_Surface * surface) {
 
     if (! NULL_BLOCK(current_block)) {
       draw_shape(surface, FIELD_X + current_block.x * TILE_WIDTH, FIELD_Y + current_block.y * TILE_HEIGHT, current_block.shape, current_block.rot);
-      draw_shape_destination(surface, current_block);
+      draw_block_destination(surface, current_block);
     }
 
     SDL_UpdateRect(surface, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
