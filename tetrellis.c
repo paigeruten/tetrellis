@@ -1,3 +1,4 @@
+#include <math.h>
 #include "SDL/SDL.h"
 #include "tetrellis.h"
 
@@ -69,6 +70,8 @@ void update_gamestate(Tetrellis * tetrellis) {
 }
 
 void render(SDL_Surface * surface, Tetrellis * tetrellis) {
+  SDL_FillRect(surface, NULL, COLOR_BACKGROUND);
+
   draw_field(tetrellis->field, surface);
   draw_next_shape(surface, tetrellis->next_shape);
 
@@ -93,10 +96,23 @@ void game(SDL_Surface * surface) {
 
   clear_field(tetrellis.field);
 
+  int tick = SDL_GetTicks();
+
   while (! tetrellis.quit) {
     handle_input(&tetrellis);
     update_gamestate(&tetrellis);
     render(surface, &tetrellis);
+
+    // WHIRL CODE
+       if (SDL_GetTicks() - tick > 100) {
+         TILE_WIDTH = rand() % 5 + 15;
+         TILE_HEIGHT = rand() % 5 + 15;
+         tick = SDL_GetTicks();
+       }
+
+       FIELD_X = 300 + cos((float)SDL_GetTicks() / 500.0f) * 150.0;
+       FIELD_Y = 150 + sin((float)SDL_GetTicks() / 500.0f) * 150.0;
+    // THAT'S IT
 
     SDL_Delay(1);
   }

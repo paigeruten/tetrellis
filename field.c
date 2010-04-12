@@ -2,6 +2,9 @@
 #include "SDL/SDL.h"
 #include "field.h"
 
+int FIELD_X = 10;
+int FIELD_Y = 10;
+
 Field make_field(void) {
   Field field = (Field)malloc(sizeof(int) * FIELD_WIDTH * FIELD_HEIGHT);
   return field;

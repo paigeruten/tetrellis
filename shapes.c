@@ -2,6 +2,9 @@
 #include "SDL/SDL.h"
 #include "shapes.h"
 
+int TILE_WIDTH = 20;
+int TILE_HEIGHT = 20;
+
 int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH] = {
   // I
   {

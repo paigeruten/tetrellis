@@ -11,8 +11,10 @@
 #define SHAPE_WIDTH 4
 #define SHAPE_HEIGHT 4
 
-#define TILE_WIDTH 20
-#define TILE_HEIGHT 20
+//#define TILE_WIDTH 20
+//#define TILE_HEIGHT 35
+extern int TILE_WIDTH;
+extern int TILE_HEIGHT;
 
 extern int shapes[NUM_SHAPES][NUM_ROTATIONS][SHAPE_HEIGHT][SHAPE_WIDTH];
 
