@@ -101,5 +101,3 @@ void game(SDL_Surface * surface) {
   }
 }
 
-
-

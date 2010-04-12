@@ -21,6 +21,9 @@ typedef struct {
   int quit;
 } Tetrellis;
 
+void handle_input(Tetrellis * tetrellis);
+void update_gamestate(Tetrellis * tetrellis);
+void render(SDL_Surface * surface, Tetrellis * tetrellis);
 void game(SDL_Surface * surface);
 
 #endif
