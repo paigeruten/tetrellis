@@ -19,7 +19,7 @@ int collision(Block block) {
   for (i = 0; i < SHAPE_HEIGHT; i++) {
     for (j = 0; j < SHAPE_WIDTH; j++) {
       if (shapes[block.shape][block.rot][i][j]) {
-        if (! NULL_SHAPE(field[block.y + i][block.x + j])) {
+        if (! NULL_SHAPE(field_get(block.x + j, block.y + i))) {
           return 1;
         }
       }
@@ -37,57 +37,12 @@ void freeze_block(void) {
   for (i = 0; i < SHAPE_HEIGHT; i++) {
     for (j = 0; j < SHAPE_WIDTH; j++) {
       if (shapes[current_block.shape][current_block.rot][i][j]) {
-        field[current_block.y + i][current_block.x + j] = current_block.shape;
+        field_set(current_block.x + j, current_block.y + i, current_block.shape);
       }
     }
   }
 
   current_block = BLOCK_NULL;
-}
-
-void clear_line(int line) {
-  int current_line;
-  int i;
-
-  for (current_line = line; current_line > 0; current_line--) {
-    for (i = 0; i < FIELD_WIDTH; i++) {
-      field[current_line][i] = field[current_line - 1][i];
-    }
-  }
-}
-
-int clear_lines(void) {
-  int i, j;
-  int line_full;
-  int lines_cleared = 0;
-
-  for (i = 0; i < FIELD_HEIGHT; i++) {
-    line_full = 1;
-    for (j = 0; j < FIELD_WIDTH; j++) {
-      if (NULL_SHAPE(field[i][j])) {
-        line_full = 0;
-      }
-    }
-
-    if (line_full) {
-      clear_line(i);
-      lines_cleared++;
-    }
-  }
-
-  return lines_cleared;
-}
-
-int game_over(void) {
-  int i;
-
-  for (i = 0; i < FIELD_WIDTH; i++) {
-    if (! NULL_SHAPE(field[0][i])) {
-      return 1;
-    }
-  }
-
-  return 0;
 }
 
 void draw_next_shape(SDL_Surface * surface) {

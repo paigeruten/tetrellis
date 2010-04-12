@@ -26,9 +26,6 @@ typedef struct {
 
 int collision(Block block);
 void freeze_block(void);
-void clear_line(int line);
-int clear_lines(void);
-int game_over(void);
 void draw_next_shape(SDL_Surface * surface);
 int move_block(int dx, int dy);
 void rotate_block(void);
