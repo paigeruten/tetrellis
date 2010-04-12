@@ -25,11 +25,11 @@ typedef struct {
 #define NULL_BLOCK(x) (NULL_SHAPE((x).shape))
 
 int collision(Block block);
-void freeze_block(void);
-void draw_next_shape(SDL_Surface * surface);
-int move_block(int dx, int dy);
-void rotate_block(void);
-void drop_block(void);
+Block freeze_block(Block block);
+void draw_next_shape(SDL_Surface * surface, int shape);
+Block move_block(Block block, int dx, int dy);
+Block rotate_block(Block block);
+Block drop_block(Block block);
 void tetrellis(SDL_Surface * surface);
 
 #endif

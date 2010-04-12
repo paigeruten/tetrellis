@@ -1,11 +1,7 @@
 #include "SDL/SDL.h"
 #include "tetrellis.h"
 
-Block BLOCK_NULL = (Block){ SHAPE_NULL, 0, 0, 0 };
-
-Block current_block;
-int next_shape;
-int speed;
+const Block BLOCK_NULL = (Block){ SHAPE_NULL, 0, 0, 0 };
 
 int collision(Block block) {
   int i, j;
@@ -29,23 +25,23 @@ int collision(Block block) {
   return 0;
 }
 
-void freeze_block(void) {
-  if (NULL_BLOCK(current_block)) return;
+Block freeze_block(Block block) {
+  if (NULL_BLOCK(block)) return;
 
   int i, j;
 
   for (i = 0; i < SHAPE_HEIGHT; i++) {
     for (j = 0; j < SHAPE_WIDTH; j++) {
-      if (shapes[current_block.shape][current_block.rot][i][j]) {
-        field_set(current_block.x + j, current_block.y + i, current_block.shape);
+      if (shapes[block.shape][block.rot][i][j]) {
+        field_set(block.x + j, block.y + i, block.shape);
       }
     }
   }
 
-  current_block = BLOCK_NULL;
+  return BLOCK_NULL;
 }
 
-void draw_next_shape(SDL_Surface * surface) {
+void draw_next_shape(SDL_Surface * surface, int shape) {
   int i, j;
   SDL_Rect background;
   SDL_Rect border;
@@ -64,17 +60,16 @@ void draw_next_shape(SDL_Surface * surface) {
   SDL_FillRect(surface, &background, COLOR_FIELD_BACKGROUND);
 
   draw_shape(surface,
-             NEXT_SHAPE_X + (NEXT_SHAPE_WIDTH * TILE_WIDTH - real_shape_width(next_shape, 0) * TILE_WIDTH) / 2,
-             NEXT_SHAPE_Y + (NEXT_SHAPE_HEIGHT - real_shape_height(next_shape, 0)) * TILE_HEIGHT / 2 - (SHAPE_HEIGHT - real_shape_height(next_shape, 0)) * TILE_HEIGHT,
-             next_shape,
+             NEXT_SHAPE_X + (NEXT_SHAPE_WIDTH * TILE_WIDTH - real_shape_width(shape, 0) * TILE_WIDTH) / 2,
+             NEXT_SHAPE_Y + (NEXT_SHAPE_HEIGHT - real_shape_height(shape, 0)) * TILE_HEIGHT / 2 - (SHAPE_HEIGHT - real_shape_height(shape, 0)) * TILE_HEIGHT,
+             shape,
              0);
 }
 
-// returns true if block gets frozen
-int move_block(int dx, int dy) {
-  if (NULL_BLOCK(current_block)) return 0;
+Block move_block(Block block, int dx, int dy) {
+  if (NULL_BLOCK(block)) return block;
 
-  Block new_block = current_block;
+  Block new_block = block;
   new_block.x += dx;
   new_block.y += dy;
 
@@ -82,24 +77,25 @@ int move_block(int dx, int dy) {
     // if the block is moving down, then it should come to rest.
     // otherwise just do nothing.
     if (dy) {
-      freeze_block();
-      return 1;
+      return freeze_block(block);
+    } else {
+      return block;
     }
   } else {
-    current_block = new_block;
+    return new_block;
   }
-
-  return 0;
 }
 
-void rotate_block(void) {
-  if (NULL_BLOCK(current_block)) return;
+Block rotate_block(Block block) {
+  if (NULL_BLOCK(block)) return block;
 
-  Block new_block = current_block;
-  new_block.rot = (current_block.rot + 1) % NUM_ROTATIONS;
+  Block new_block = block;
+  new_block.rot = (block.rot + 1) % NUM_ROTATIONS;
 
-  if (! collision(new_block)) {
-    current_block = new_block;
+  if (collision(new_block)) {
+    return block;
+  } else {
+    return new_block;
   }
 }
 
@@ -112,11 +108,14 @@ void draw_shape_destination(SDL_Surface * surface, Block block) {
   draw_shape_outline(surface, FIELD_X + block.x * TILE_WIDTH, FIELD_Y + block.y * TILE_HEIGHT, block.shape, block.rot);
 }
 
-void drop_block(void) {
-  if (NULL_BLOCK(current_block)) return;
+Block drop_block(Block block) {
+  if (NULL_BLOCK(block)) return block;
 
-  while (! move_block(0, 1))
-    ;
+  while (! NULL_BLOCK(block)) {
+    block = move_block(block, 0, 1);
+  }
+
+  return block;
 }
 
 void tetrellis(SDL_Surface * surface) {
@@ -125,6 +124,9 @@ void tetrellis(SDL_Surface * surface) {
   long last_tick;
   int lines, lines_cleared;
   int level;
+  Block current_block;
+  int next_shape;
+  int speed;
 
   clear_field();
 
@@ -142,16 +144,16 @@ void tetrellis(SDL_Surface * surface) {
       switch (event.type) {
         case SDL_KEYDOWN:
           if (event.key.keysym.sym == SDLK_UP) {
-            rotate_block();
+            current_block = rotate_block(current_block);
           } else if (event.key.keysym.sym == SDLK_LEFT) {
-            move_block(-1, 0);
+            current_block = move_block(current_block, -1, 0);
           } else if (event.key.keysym.sym == SDLK_RIGHT) {
-            move_block(1, 0);
+            current_block = move_block(current_block, 1, 0);
           } else if (event.key.keysym.sym == SDLK_DOWN) {
-            move_block(0, 1);
+            current_block = move_block(current_block, 0, 1);
             last_tick = SDL_GetTicks();
           } else if (event.key.keysym.sym == SDLK_SPACE) {
-            drop_block();
+            current_block = drop_block(current_block);
           }
           break;
 
@@ -174,7 +176,7 @@ void tetrellis(SDL_Surface * surface) {
       next_shape = random_shape();
     } else {
       if (SDL_GetTicks() - last_tick > speed) {
-        move_block(0, 1);
+        current_block = move_block(current_block, 0, 1);
         last_tick = SDL_GetTicks();
       }
     }
@@ -200,7 +202,7 @@ void tetrellis(SDL_Surface * surface) {
 
     // render to screen
     draw_field(surface);
-    draw_next_shape(surface);
+    draw_next_shape(surface, next_shape);
 
     if (! NULL_BLOCK(current_block)) {
       draw_shape(surface, FIELD_X + current_block.x * TILE_WIDTH, FIELD_Y + current_block.y * TILE_HEIGHT, current_block.shape, current_block.rot);
